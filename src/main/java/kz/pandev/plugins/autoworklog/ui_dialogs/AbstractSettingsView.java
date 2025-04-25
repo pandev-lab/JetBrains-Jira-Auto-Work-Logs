@@ -136,7 +136,7 @@ public class AbstractSettingsView extends DialogWrapper {
             imageLabel = new JLabel(e.getMessage());
         }
 
-        JLabel titleLabel = new JLabel("PanDev Autoworklog");
+        JLabel titleLabel = new JLabel("PanDev Jira Auto Worklog");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         imageLabel.setBorder(JBUI.Borders.emptyRight(5));
 
