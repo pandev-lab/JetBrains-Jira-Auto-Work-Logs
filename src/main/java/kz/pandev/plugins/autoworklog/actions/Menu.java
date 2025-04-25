@@ -9,7 +9,7 @@ import kz.pandev.plugins.autoworklog.ui_dialogs.LoginPage;
 import kz.pandev.plugins.autoworklog.ui_dialogs.Settings;
 
 /**
- * Класс, представляющий действие для открытия настроек плагина PanDevJiraAutoWorklog из меню.
+ * Класс, представляющий действие для открытия настроек плагина PanDev Jira Auto Worklog из меню.
  */
 public class Menu extends AnAction {
 
@@ -18,7 +18,7 @@ public class Menu extends AnAction {
      * Устанавливает название действия в меню.
      */
     public Menu() {
-        super("PanDevJiraAutoWorklog Settings");
+        super("PanDev Jira Auto Worklog Settings");
     }
 
     /**

@@ -31,7 +31,7 @@ public class PanDevStatusBarFactory implements StatusBarWidgetFactory {
      */
     @Override
     public @NotNull @NlsContexts.ConfigurableName String getDisplayName() {
-        return "PanDevJiraAutoWorklog Status";
+        return "PanDev Jira Auto Worklog Status";
     }
 
     /**
