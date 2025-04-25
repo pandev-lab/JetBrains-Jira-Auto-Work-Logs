@@ -1,0 +1,61 @@
+package kz.pandev.plugins.autoworklog.ui_dialogs;
+
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.wm.StatusBar;
+import com.intellij.openapi.wm.StatusBarWidget;
+import com.intellij.openapi.wm.WindowManager;
+import kz.pandev.plugins.autoworklog.configs.ServerSettings;
+import kz.pandev.plugins.autoworklog.factory.ServerSettingsFactory;
+import kz.pandev.plugins.autoworklog.widgets.PanDevStatusbarWidget;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class LoginPage extends AbstractSettingsView {
+
+    public LoginPage(@Nullable Project project) {
+        super(project);
+        setOKButtonText("Save");
+        init();
+    }
+
+    @Override
+    protected @Nullable ValidationInfo doValidate() {
+        String urlPattern = "^https?://[a-zA-Z0-9-\\.]+(?:\\:\\d+)?$";
+        Pattern compile = Pattern.compile(urlPattern);
+        Matcher matcherUrl = compile.matcher(urlInput.getText());
+        if (!matcherUrl.matches()) {
+            return new ValidationInfo("Invalid url.", urlInput);
+        }
+        return super.doValidate();
+    }
+
+    @Override
+    public void doOKAction() {
+        ServerSettingsFactory.updateInstance(Map.of(
+                        ServerSettings.URL_KEY, urlInput.getText(),
+                        ServerSettings.USERNAME_KEY, isBasicAuthEnabled ? usernameInput.getText() : "",
+                        ServerSettings.TOKEN_KEY, new String(passwordInput.getPassword())));
+        for (Project openProject : Objects.requireNonNull(ProjectManager.getInstanceIfCreated()).getOpenProjects()) {
+            StatusBar statusBar = WindowManager.getInstance().getStatusBar(openProject);
+            if (statusBar != null) {
+                StatusBarWidget widget = statusBar.getWidget(PanDevStatusbarWidget.WIDGET_ID);
+                if (widget == null) {
+                    PanDevStatusbarWidget newWidget = new PanDevStatusbarWidget();
+                    statusBar.addWidget(newWidget);
+                }
+            }
+        }
+        super.doOKAction();
+        showInformationDialog();
+    }
+
+    public void promptForEmail() {
+        this.show();
+    }
+}

@@ -1,0 +1,47 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+  <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+  <id>kz.pandev.intellij.jira-auto-worklog</id>
+
+  <!-- Public plugin name should be written in Title Case.
+       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+  <name>PanDev Jira Auto Worklog</name>
+  <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+  <vendor email="support@pandev.kz" url="https://www.pandev.kz">PanDev</vendor>
+
+  <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+       Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+       Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+  <description>
+    This plugin automatically logs time spent on tasks in your issue tracking system based on your commits in JetBrains IDEs.
+    Every time you commit changes, the plugin calculates the time spent on your work and adds it directly to the corresponding issue.
+    It helps developers maintain accurate work logs without manual input, streamlining the process and ensuring that your time tracking is always up to date.
+    Please note that this is an independent tool and is not officially affiliated with any issue tracking platform.
+  </description>
+  <!-- Product and plugin compatibility requirements.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.platform</depends>
+
+  <!-- Extension points defined by the plugin.
+       Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+  <extensions defaultExtensionNs="com.intellij">
+    <statusBarWidgetFactory implementation="kz.pandev.plugins.autoworklog.widgets.PanDevStatusBarFactory"
+                            id="PanDevStatusbarWidget"/>
+    <postStartupActivity implementation="kz.pandev.plugins.autoworklog.PanDevAutoWorklogStartupActivity"/>
+  </extensions>
+
+  <actions>
+    <action id="PandevAutoworklogPluginMenu"
+            class="kz.pandev.plugins.autoworklog.actions.Menu"
+            text="PanDev Autoworklog">
+      <add-to-group group-id="ToolsMenu" anchor="first" />
+    </action>
+  </actions>
+
+  <application-components>
+    <component>
+      <implementation-class>kz.pandev.plugins.autoworklog.PanDevJiraAutoWorklog</implementation-class>
+    </component>
+  </application-components>
+</idea-plugin>
