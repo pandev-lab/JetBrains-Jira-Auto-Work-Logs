@@ -17,7 +17,8 @@ import java.awt.event.MouseEvent;
  * Jetbrains plugins docs</a>
  */
 public class PanDevStatusbarWidget implements CustomStatusBarWidget {
-    public static final String WIDGET_ID = "PanDevAutoworklogStatusbarWidget";
+
+    public static final String WIDGET_ID = "PanDevAutoWorklogStatusbarWidget";
     private final JLabel logoLabel;
     private JPanel panel;
 
@@ -63,7 +64,6 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
         return panel;
     }
 
-
     /**
      * Получает уникальный идентификатор виджета.
      *
@@ -74,7 +74,6 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
     public String ID() {
         return WIDGET_ID;
     }
-
 
     /**
      * Получает иконку плагина для статус-бара

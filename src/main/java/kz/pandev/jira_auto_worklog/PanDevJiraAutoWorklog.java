@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Service(Service.Level.APP)
-public class PanDevJiraAutoWorklog implements Disposable {
+public final class PanDevJiraAutoWorklog implements Disposable {
 
     public static final BigDecimal FREQUENCY = new BigDecimal(2 * 60);
     public static final Logger log = LogManager.getLogger(PanDevJiraAutoWorklog.class);
@@ -88,8 +88,7 @@ public class PanDevJiraAutoWorklog implements Disposable {
 
     @Override
     public void dispose() {
-        try {
-            // Сначала освобождаем ресурсы
+
             if (connection != null) {
                 try {
                     connection.disconnect();
@@ -98,7 +97,6 @@ public class PanDevJiraAutoWorklog implements Disposable {
                 }
             }
 
-            // Затем сохраняем данные
             try {
                 Map<String, String> tempMap = new HashMap<>();
                 heartbeatsCache.forEach((k,v) -> tempMap.put(k, v.toString()));
@@ -110,10 +108,6 @@ public class PanDevJiraAutoWorklog implements Disposable {
             } catch (Exception e) {
                 log.error("Error saving cache data", e);
             }
-
-        } catch (Exception e) {
-            log.error("Error during dispose", e);
-        }
     }
 
     public static BigDecimal getCurrentTimestamp() {
