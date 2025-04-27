@@ -13,7 +13,7 @@
 
 # Устраняем предупреждения
 -dontwarn com.intellij.**
--dontwarn kz.pandev.plugins.autoworklog.**
+-dontwarn kz.pandev.jira_auto_worklog.**
 
 # Убираем оптимизацию и сжатие кода
 -dontoptimize
@@ -43,7 +43,7 @@
 -dontwarn com.fasterxml.jackson.databind.**
 
 # DTO для сериализации (сохраняем все поля и методы)
--keep class kz.pandev.plugins.autoworklog.models.** { *; }
+-keep class kz.pandev.jira_auto_worklog.models.** { *; }
 
 # Jackson аннотации
 -keepclassmembers class * {
