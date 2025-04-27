@@ -5,7 +5,6 @@ import com.intellij.openapi.ui.ValidationInfo;
 import kz.pandev.jira_auto_worklog.configs.ServerSettings;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
