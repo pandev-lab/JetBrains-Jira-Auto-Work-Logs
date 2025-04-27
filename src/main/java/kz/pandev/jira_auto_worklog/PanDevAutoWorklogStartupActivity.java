@@ -1,5 +1,6 @@
 package kz.pandev.jira_auto_worklog;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.Unit;
@@ -24,6 +25,7 @@ public class PanDevAutoWorklogStartupActivity implements ProjectActivity {
     @Nullable
     @Override
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
+        ApplicationManager.getApplication().getService(PanDevJiraAutoWorklog.class);
         project.getService(GitCommitWatcher.class);
         ServerSettingsCheckUtil.checkIsConfigured();
         return null;
