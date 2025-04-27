@@ -7,8 +7,7 @@ plugins {
 }
 
 group = "kz.pandev"
-version = "1.0.0"
-
+version = "2025.1.1"
 
 dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.24.3")

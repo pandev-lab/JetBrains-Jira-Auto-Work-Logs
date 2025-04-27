@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
   <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-  <id>kz.pandev.jira-auto-worklog</id>
+  <id>kz.pandev.jira_auto_worklog</id>
 
   <!-- Public plugin name should be written in Title Case.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
@@ -12,12 +12,16 @@
   <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-  <description>
-    This plugin automatically logs time spent on tasks in your issue tracking system based on your commits in JetBrains IDEs.
-    Every time you commit changes, the plugin calculates the time spent on your work and adds it directly to the corresponding issue.
-    It helps developers maintain accurate work logs without manual input, streamlining the process and ensuring that your time tracking is always up to date.
-    Please note that this is an independent tool and is not officially affiliated with any issue tracking platform.
-  </description>
+  <description><![CDATA[
+This plugin automatically logs time spent on tasks in your issue tracking system based on your commits in JetBrains IDEs.<br/>
+Every time you commit changes, the plugin calculates the time spent on your work and adds it directly to the corresponding issue.<br/>
+<br/>
+It helps developers maintain accurate work logs without manual input, streamlining the process and ensuring that your time tracking is always up to date.<br/>
+<br/>
+Please note that this is an independent tool and is not officially affiliated with any issue tracking platform.
+]]></description>
+  <product-descriptor code="PPANDEVJIRAAUTO" release-date="20250427" release-version="20251"/>
+
   <!-- Product and plugin compatibility requirements.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
   <depends>com.intellij.modules.lang</depends>
@@ -26,22 +30,17 @@
   <!-- Extension points defined by the plugin.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
   <extensions defaultExtensionNs="com.intellij">
-    <statusBarWidgetFactory implementation="kz.pandev.plugins.autoworklog.widgets.PanDevStatusBarFactory"
-                            id="PanDevStatusbarWidget"/>
-    <postStartupActivity implementation="kz.pandev.plugins.autoworklog.PanDevAutoWorklogStartupActivity"/>
+    <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory"
+    id="PanDevAutoWorklogStatusbarWidget"/>
+    <postStartupActivity implementation="kz.pandev.jira_auto_worklog.PanDevAutoWorklogStartupActivity"/>
+
   </extensions>
 
   <actions>
-    <action id="PandevAutoworklogPluginMenu"
-            class="kz.pandev.plugins.autoworklog.actions.Menu"
-            text="PanDev Autoworklog">
+    <action id="PandevAutoWorklogPluginMenu"
+            class="kz.pandev.jira_auto_worklog.actions.Menu"
+            text="PanDev Jira Auto Worklog Settings">
       <add-to-group group-id="ToolsMenu" anchor="first" />
     </action>
   </actions>
-
-  <application-components>
-    <component>
-      <implementation-class>kz.pandev.plugins.autoworklog.PanDevJiraAutoWorklog</implementation-class>
-    </component>
-  </application-components>
 </idea-plugin>

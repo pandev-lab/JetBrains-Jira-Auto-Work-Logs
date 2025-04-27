@@ -1,8 +1,8 @@
 # Сохраняем используемые классы из plugin.xml
--keep class kz.pandev.plugins.autoworklog.widgets.PanDevStatusBarFactory { *; }
--keep class kz.pandev.plugins.autoworklog.PanDevAutoWorklogStartupActivity { *; }
--keep class kz.pandev.plugins.autoworklog.actions.Menu { *; }
--keep class kz.pandev.plugins.autoworklog.PanDevJiraAutoWorklog { *; }
+-keep class kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory { *; }
+-keep class kz.pandev.jira_auto_worklog.PanDevAutoWorklogStartupActivity { *; }
+-keep class kz.pandev.jira_auto_worklog.actions.Menu { *; }
+-keep class kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog { *; }
 
 # Сохраняем зависимости IntelliJ Platform
 -keep class com.intellij.** { *; }
@@ -13,7 +13,7 @@
 
 # Устраняем предупреждения
 -dontwarn com.intellij.**
--dontwarn kz.pandev.plugins.autoworklog.**
+-dontwarn kz.pandev.jira_auto_worklog.**
 
 # Убираем оптимизацию и сжатие кода
 -dontoptimize
@@ -26,7 +26,7 @@
 -keepclassmembers class * { public static ** INSTANCE; }
 
 # Сохраняем API-клиент и используемые классы
--keep class kz.pandev.plugins.autoworklog.clients.ApiClient { *; }
+-keep class clients.kz.pandev.jira_auto_worklog.ApiClient { *; }
 
 # Сохраняем Jackson для сериализации/десериализации
 -keep class com.fasterxml.jackson.databind.** { *; }
@@ -43,7 +43,7 @@
 -dontwarn com.fasterxml.jackson.databind.**
 
 # DTO для сериализации (сохраняем все поля и методы)
--keep class kz.pandev.plugins.autoworklog.models.** { *; }
+-keep class kz.pandev.jira_auto_worklog.models.** { *; }
 
 # Jackson аннотации
 -keepclassmembers class * {
