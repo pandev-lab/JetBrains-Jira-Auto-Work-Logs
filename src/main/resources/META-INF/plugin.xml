@@ -28,8 +28,8 @@
   <extensions defaultExtensionNs="com.intellij">
     <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory"/>
     <postStartupActivity implementation="kz.pandev.jira_auto_worklog.PanDevAutoWorklogStartupActivity"/>
-    <applicationService
-            serviceImplementation="kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog" preload="true"/>
+<!--    <applicationService-->
+<!--            serviceImplementation="kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog" preload="true"/>-->
   </extensions>
 
   <actions>
