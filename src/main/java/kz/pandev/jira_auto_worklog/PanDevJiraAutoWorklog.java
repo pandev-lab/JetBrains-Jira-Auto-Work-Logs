@@ -24,6 +24,7 @@ import kz.pandev.jira_auto_worklog.utils.SettingsFileReadWriterUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
