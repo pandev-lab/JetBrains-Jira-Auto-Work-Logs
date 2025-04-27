@@ -12,12 +12,16 @@
   <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-  <description>
-    This plugin automatically logs time spent on tasks in your issue tracking system based on your commits in JetBrains IDEs.
-    Every time you commit changes, the plugin calculates the time spent on your work and adds it directly to the corresponding issue.
-    It helps developers maintain accurate work logs without manual input, streamlining the process and ensuring that your time tracking is always up to date.
-    Please note that this is an independent tool and is not officially affiliated with any issue tracking platform.
-  </description>
+  <description><![CDATA[
+This plugin automatically logs time spent on tasks in your issue tracking system based on your commits in JetBrains IDEs.<br/>
+Every time you commit changes, the plugin calculates the time spent on your work and adds it directly to the corresponding issue.<br/>
+<br/>
+It helps developers maintain accurate work logs without manual input, streamlining the process and ensuring that your time tracking is always up to date.<br/>
+<br/>
+Please note that this is an independent tool and is not officially affiliated with any issue tracking platform.
+]]></description>
+  <product-descriptor code="PPANDEVJIRAAUTO" release-date="20250427" release-version="20251"/>
+
   <!-- Product and plugin compatibility requirements.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
   <depends>com.intellij.modules.lang</depends>
