@@ -30,14 +30,14 @@ Please note that this is an independent tool and is not officially affiliated wi
   <!-- Extension points defined by the plugin.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
   <extensions defaultExtensionNs="com.intellij">
-    <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory"/>
+    <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory"
+    id="PanDevAutoWorklogStatusbarWidget"/>
     <postStartupActivity implementation="kz.pandev.jira_auto_worklog.PanDevAutoWorklogStartupActivity"/>
-    <applicationService
-            serviceImplementation="kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog" preload="true"/>
+
   </extensions>
 
   <actions>
-    <action id="PandevAutoworklogPluginMenu"
+    <action id="PandevAutoWorklogPluginMenu"
             class="kz.pandev.jira_auto_worklog.actions.Menu"
             text="PanDev Jira Auto Worklog Settings">
       <add-to-group group-id="ToolsMenu" anchor="first" />
