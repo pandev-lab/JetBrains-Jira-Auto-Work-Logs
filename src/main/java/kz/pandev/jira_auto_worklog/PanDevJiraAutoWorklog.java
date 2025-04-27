@@ -32,7 +32,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@Service
+@Service(Service.Level.APP)
 public class PanDevJiraAutoWorklog implements Disposable {
 
     public static final BigDecimal FREQUENCY = new BigDecimal(2 * 60);
@@ -89,13 +89,31 @@ public class PanDevJiraAutoWorklog implements Disposable {
     @Override
     public void dispose() {
         try {
-            connection.disconnect();
-        } catch (Exception ignored) {
-            // Nothing to do
+            // Сначала освобождаем ресурсы
+            if (connection != null) {
+                try {
+                    connection.disconnect();
+                } catch (Exception e) {
+                    log.error("Error disconnecting message bus", e);
+                }
+            }
+
+            // Затем сохраняем данные
+            try {
+                Map<String, String> tempMap = new HashMap<>();
+                heartbeatsCache.forEach((k,v) -> tempMap.put(k, v.toString()));
+                SettingsFileReadWriterUtil.writeAll(
+                        ServerSettingsFactory.getInstance().getCacheFile(),
+                        CACHE_SETTINGS,
+                        tempMap
+                );
+            } catch (Exception e) {
+                log.error("Error saving cache data", e);
+            }
+
+        } catch (Exception e) {
+            log.error("Error during dispose", e);
         }
-        Map<String, String> tempMap = new HashMap<>();
-        heartbeatsCache.forEach((k,v) -> tempMap.put(k, v.toString()));
-        SettingsFileReadWriterUtil.writeAll(ServerSettingsFactory.getInstance().getCacheFile(), CACHE_SETTINGS, tempMap);
     }
 
     public static BigDecimal getCurrentTimestamp() {
