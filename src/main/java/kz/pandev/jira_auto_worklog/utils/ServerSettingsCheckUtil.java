@@ -32,9 +32,6 @@ public class ServerSettingsCheckUtil {
         });
     }
 
-    public static boolean isIsLoginPageCanceled() {
-        return isLoginPageCanceled;
-    }
 
     public static void setIsLoginPageCanceled(boolean isLoginPageCanceled) {
         ServerSettingsCheckUtil.isLoginPageCanceled = isLoginPageCanceled;
