@@ -178,7 +178,6 @@ public class PanDevJiraAutoWorklog implements Disposable {
         }
     }
 
-
     public static Module getCurrentModule(Project project, VirtualFile virtualFile) {
         ModuleManager moduleManager = ModuleManager.getInstance(project);
         Module[] modules = moduleManager.getModules();
