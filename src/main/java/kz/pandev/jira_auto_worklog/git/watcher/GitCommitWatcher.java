@@ -159,7 +159,7 @@ public final class GitCommitWatcher implements Disposable {
      * Проверяет наличие новых коммитов в репозитории.
      */
     private void checkForNewCommits() {
-        ApplicationManager.getApplication().runReadAction(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             try (Repository repository = new FileRepositoryBuilder()
                     .setGitDir(new File(projectBasePath, ".git"))
                     .readEnvironment()
