@@ -96,7 +96,7 @@ public class ApiClient {
         HttpRequest request = requestBuilder.build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if(response.statusCode() != 200) {
+            if (response.statusCode() != 200) {
                 throw new HttpResponseException(response.statusCode(), response.body());
             }
     }
