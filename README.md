@@ -21,8 +21,7 @@ A plugin for JetBrains products that automatically tracks your work time and pub
 2. Enter your Jira credentials:
     - Jira URL
     - Username (your Jira email)
-    - Password (or API token)
-    - Enable Basic Auth if required
+    - Token (your API token)
 3. Click "Save" to apply settings
 
 ![login_view](screenshots/login.png)
