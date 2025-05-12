@@ -3,8 +3,9 @@ package kz.pandev.jira_auto_worklog.clients;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kz.pandev.jira_auto_worklog.configs.ServerSettings;
 import kz.pandev.jira_auto_worklog.models.WorklogDto;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.http.client.HttpResponseException;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -42,7 +43,7 @@ public class ApiClient {
                     .uri(URI.create(String.format(url, issueKey)))
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody));
 
-            getHttpClientHeaders(settings.getUsername(), settings.getToken()).forEach(requestBuilder::header);
+            getHttpClientHeaders(url, settings.getUsername(), settings.getToken()).forEach(requestBuilder::header);
 
             HttpRequest request = requestBuilder.build();
 
@@ -59,42 +60,45 @@ public class ApiClient {
      *
      * @return Map с заголовками для HTTP-запроса
      */
-    private static Map<String, String> getHttpClientHeaders(String username, String token) {
+    private static Map<String, String> getHttpClientHeaders(String url, String username, String token) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", APPLICATION_CONTENT_TYPE);
 
-        if (!StringUtils.isEmpty(username)) {
+        if (isJiraCloud(url)) {
             headers.put(AUTHORIZATION, BASIC + Base64.getEncoder()
                     .encodeToString((username + ":" + token).getBytes()));
         } else {
             headers.put(AUTHORIZATION, BEARER + token);
         }
-
-
         return headers;
     }
 
     /**
-     * Отправляет тестовый GET запрос на URL хоста
+     * Проверяет, является ли URL хоста Jira облачным.
      *
-     * @return ResponseEntity с результатом запроса.
+     * @param url URL хоста Jira.
+     * @return true, если это облачный хост, иначе false.
      */
-    public static boolean validateHost(String url, String username, String token) {
+    private static boolean isJiraCloud(String url) {
+        return url != null && url.matches("^https://[a-zA-Z0-9-]+\\.atlassian\\.net.*$");
+    }
 
+    /**
+     * Отправляет тестовый GET запрос на URL хоста
+     **/
+    public static void validateHost(String url, String username, String token) throws IOException, InterruptedException {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(url + MYSELF))
                 .GET();
 
-        getHttpClientHeaders(username, token).forEach(requestBuilder::header);
+        getHttpClientHeaders(url, username, token).forEach(requestBuilder::header);
 
         HttpRequest request = requestBuilder.build();
-        try {
+
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return response != null &&  response.statusCode() == 200;
-        }
-        catch(Exception e) {
-            return false;
-        }
+            if(response.statusCode() != 200) {
+                throw new HttpResponseException(response.statusCode(), response.body());
+            }
     }
 }
 

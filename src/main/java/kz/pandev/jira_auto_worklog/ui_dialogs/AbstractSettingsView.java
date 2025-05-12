@@ -15,7 +15,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,13 +26,11 @@ public class AbstractSettingsView extends DialogWrapper {
 
     protected JLabel urlLabel;
     protected JTextField urlInput;
-    protected JLabel passwordLabel;
-    protected JPasswordField passwordInput;
-    protected JCheckBox basicAuthCheckbox;
+    protected JLabel tokenLabel;
+    protected JPasswordField tokenInput;
     protected JLabel usernameLabel;
     protected JTextField usernameInput;
     protected JPanel reportProblemLinkPanel;
-    protected boolean isBasicAuthEnabled;
 
     protected AbstractSettingsView(@Nullable Project project) {
         super(project, true);
@@ -77,46 +74,28 @@ public class AbstractSettingsView extends DialogWrapper {
         urlInput.getDocument().addDocumentListener(documentListener);
         userInfoOuterPanel.add(urlLabel);
         userInfoOuterPanel.add(urlInput);
+        urlInput.setToolTipText("Enter your Jira server URL, e.g., https://jira.example.com");
 
         usernameLabel = new JLabel("Username");
         usernameInput = new JTextField();
         usernameLabel.setBorder(JBUI.Borders.emptyTop(5));
         usernameInput.getDocument().addDocumentListener(documentListener);
-        usernameLabel.setVisible(false); // Initially hidden
-        usernameInput.setVisible(false); // Initially hidden
+        usernameInput.setToolTipText("Enter your Jira username");
+
         userInfoOuterPanel.add(usernameLabel);
         userInfoOuterPanel.add(usernameInput);
 
-        passwordLabel = new JLabel("Token");
-        passwordInput = new JPasswordField();
-        passwordInput.getDocument().addDocumentListener(documentListener);
-        passwordLabel.setBorder(JBUI.Borders.emptyTop(5));
-        userInfoOuterPanel.add(passwordLabel);
-        userInfoOuterPanel.add(passwordInput);
+        tokenLabel = new JLabel("Token");
+        tokenInput = new JPasswordField();
+        tokenInput.getDocument().addDocumentListener(documentListener);
+        tokenLabel.setBorder(JBUI.Borders.emptyTop(5));
+        tokenInput.setToolTipText("Enter your Jira API token");
 
-        JPanel basicAuthPanel = new JPanel();
-        basicAuthPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // Centered horizontally
-        JLabel basicAuthLabel = new JLabel("Basic Auth");
-        basicAuthCheckbox = new JCheckBox();
-        basicAuthCheckbox.addItemListener(e -> {
-            isBasicAuthEnabled = e.getStateChange() == ItemEvent.SELECTED;
-            if (isBasicAuthEnabled) {
-                passwordLabel.setText("Password");
-                usernameLabel.setVisible(true);
-                usernameInput.setVisible(true);
-                passwordInput.setVisible(true);
-            } else {
-                passwordLabel.setText("Token");
-                usernameLabel.setVisible(false);
-                usernameInput.setVisible(false);
-                passwordInput.setVisible(true);
-            }
-            userInfoOuterPanel.revalidate();
-            userInfoOuterPanel.repaint();
-        });
-        basicAuthPanel.add(basicAuthLabel);
-        basicAuthPanel.add(basicAuthCheckbox);
-        userInfoOuterPanel.add(basicAuthPanel);
+        userInfoOuterPanel.add(tokenLabel);
+        userInfoOuterPanel.add(tokenInput);
+
+        userInfoOuterPanel.revalidate();
+        userInfoOuterPanel.repaint();
 
         return userInfoOuterPanel;
     }
@@ -198,10 +177,12 @@ public class AbstractSettingsView extends DialogWrapper {
 
     @Override
     protected @Nullable ValidationInfo doValidate() {
-        String username = isBasicAuthEnabled ? usernameInput.getText().trim() : null;
-        if (!ApiClient.validateHost(urlInput.getText(), username, new String(passwordInput.getPassword()))) {
-            return new ValidationInfo("Invalid host or password." +
-                    (isBasicAuthEnabled ? " Please check your username and password." : ""));
+        String username = usernameInput.getText().trim();
+        try {
+        ApiClient.validateHost(urlInput.getText(), username, new String(tokenInput.getPassword()));
+        }
+        catch (Exception e) {
+            return new ValidationInfo(e.getMessage());
         }
         return null;
     }
@@ -216,5 +197,4 @@ public class AbstractSettingsView extends DialogWrapper {
         InformationDialog successDialog = new InformationDialog();
         successDialog.show();
     }
-
 }

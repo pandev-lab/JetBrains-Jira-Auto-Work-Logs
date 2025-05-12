@@ -32,8 +32,8 @@ public class LoginPage extends AbstractSettingsView {
     public void doOKAction() {
         ServerSettingsFactory.updateInstance(Map.of(
                         ServerSettings.URL_KEY, urlInput.getText(),
-                        ServerSettings.USERNAME_KEY, isBasicAuthEnabled ? usernameInput.getText() : "",
-                        ServerSettings.TOKEN_KEY, new String(passwordInput.getPassword())));
+                        ServerSettings.USERNAME_KEY, usernameInput.getText(),
+                        ServerSettings.TOKEN_KEY, new String(tokenInput.getPassword())));
         super.doOKAction();
         showInformationDialog();
     }
