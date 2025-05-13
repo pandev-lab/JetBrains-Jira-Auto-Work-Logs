@@ -58,19 +58,14 @@
   <!-- Extension points defined by the plugin.
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService
-            serviceInterface="kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog"
-            serviceImplementation="kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog"/>
-
-    <postStartupActivity implementation="kz.pandev.jira_auto_worklog.PanDevAutoWorklogStartupActivity"/>
-
-
-    <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidgetFactory"/>
-
     <notificationGroup
             id="PanDev Auto Worklog"
             displayType="BALLOON"
             isLogByDefault="false"/>
+    <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory"
+                            id="PanDevAutoWorklogStatusbarWidget"/>
+    <postStartupActivity implementation="kz.pandev.jira_auto_worklog.PanDevAutoWorklogStartupActivity"/>
+
   </extensions>
 
   <actions>

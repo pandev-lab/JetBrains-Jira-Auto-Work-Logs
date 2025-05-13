@@ -96,6 +96,7 @@ public final class PanDevJiraAutoWorklog implements Disposable {
             if (connection != null) {
                 try {
                     connection.disconnect();
+
                 } catch (Exception e) {
                     log.error("Error disconnecting message bus", e);
                 }
