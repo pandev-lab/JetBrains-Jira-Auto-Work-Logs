@@ -1,10 +1,15 @@
 package kz.pandev.jira_auto_worklog.widgets;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.CustomStatusBarWidget;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog;
+import kz.pandev.jira_auto_worklog.configs.ServerSettings;
+import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
+import kz.pandev.jira_auto_worklog.ui_dialogs.LoginPage;
+import kz.pandev.jira_auto_worklog.ui_dialogs.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -22,11 +27,18 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
     private final JLabel logoLabel;
     private JPanel panel;
 
+    private final JLabel timeLabel;
+
+    private static volatile PanDevStatusbarWidget INSTANCE;
+
+
     /**
      * Конструктор, инициализирующий Widget с заданным проектом.
      * */
     public PanDevStatusbarWidget() {
+        INSTANCE = this;
         this.logoLabel = new JLabel(getLogoIcon());
+        this.timeLabel = new JLabel("0s");
     }
 
     /**
@@ -39,13 +51,22 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
         if (panel == null) {
             panel = new JPanel();
             panel.add(logoLabel);
+            panel.add(timeLabel);
             panel.setToolTipText("Powered by PanDev");
             Color backgroundColor = JBUI.CurrentTheme.StatusBar.BACKGROUND;
             Color hoverColor = JBUI.CurrentTheme.StatusBar.Widget.HOVER_BACKGROUND;
             panel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    PanDevJiraAutoWorklog.openDashboardWebsite("https://metrics.pandev.kz");
+                    Project project = PanDevJiraAutoWorklog.getCurrentProject();
+                    if (project == null) return;
+
+                    ServerSettings settings = ServerSettingsFactory.getInstance();
+                    if (settings.getUrl() == null) {
+                        new LoginPage(project).promptForEmail();
+                    } else {
+                        new Settings(project, settings).show();
+                    }
                 }
 
                 @Override
@@ -62,6 +83,15 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
             });
         }
         return panel;
+    }
+
+    public static void updateTime(long seconds) {
+        if (INSTANCE == null){
+            System.out.println("[PanDev] updateTime: INSTANCE==null");
+            return;}
+        String text = kz.pandev.jira_auto_worklog.utils.TimeFormatUtil.pretty(seconds);
+        SwingUtilities.invokeLater(() -> INSTANCE.timeLabel.setText(text));
+        System.out.println("[PanDev] updateTime -> " + text);
     }
 
     /**

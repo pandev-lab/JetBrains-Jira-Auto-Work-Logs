@@ -13,6 +13,7 @@ import kz.pandev.jira_auto_worklog.clients.ApiClient;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
 import kz.pandev.jira_auto_worklog.models.WorklogDto;
 import kz.pandev.jira_auto_worklog.utils.IssueUtil;
+import kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidget;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -255,6 +256,7 @@ public final class GitCommitWatcher implements Disposable {
 
         Map<String, Long> heartbeatsCache = PanDevJiraAutoWorklog.heartbeatsCache;
         long timeSpentSeconds = heartbeatsCache.get(complexKey);
+        if (timeSpentSeconds < 60) timeSpentSeconds = 60;
         PanDevJiraAutoWorklog.log.info("Processing new commit for project {} branch {}", projectName, branch);
         PanDevJiraAutoWorklog.log.info("time {}", timeSpentSeconds);
 
@@ -267,6 +269,7 @@ public final class GitCommitWatcher implements Disposable {
 
         if (response != null && response.statusCode() == 201) {
             heartbeatsCache.remove(complexKey);
+            PanDevStatusbarWidget.updateTime(0);
         }
     }
 }

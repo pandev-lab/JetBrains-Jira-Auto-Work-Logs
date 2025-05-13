@@ -21,6 +21,7 @@ import kz.pandev.jira_auto_worklog.listeners.*;
 import kz.pandev.jira_auto_worklog.models.Heartbeat;
 import kz.pandev.jira_auto_worklog.utils.GitInfoProvider;
 import kz.pandev.jira_auto_worklog.utils.SettingsFileReadWriterUtil;
+import kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidget;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,9 @@ public final class PanDevJiraAutoWorklog implements Disposable {
     private static Heartbeat lastHeartbeat;
     private static String lastFile = null;
     private static BigDecimal lastTime = new BigDecimal(0);
+    private static final Pattern TASK_PTRN = Pattern.compile("[A-Z]+-\\d+");
+    private static final Set<String> warnedBranches = new HashSet<>();
+
 
     public PanDevJiraAutoWorklog() {
         setConnection(ApplicationManager.getApplication().getMessageBus().connect());
@@ -134,7 +138,6 @@ public final class PanDevJiraAutoWorklog implements Disposable {
         if (currentModule != null) {
             moduleGitBranch = GitInfoProvider.getModuleGitBranch(currentModule);
         }
-
         final String projectBasePath = project.getBasePath();
         final String projectName = project.getName();
         final String[] gitInfo = GitInfoProvider.getGitBranch(projectBasePath);
@@ -165,12 +168,38 @@ public final class PanDevJiraAutoWorklog implements Disposable {
             long diff = (h.getTimestamp().subtract(lastHeartbeat.getTimestamp())).longValue();
 
             if (diff <= 900) {
-                heartbeatsCache.put(complexKey, heartbeatsCache.getOrDefault(complexKey, 0L) +
-                        diff);
+                long total = heartbeatsCache.merge(complexKey, diff, Long::sum);
+                PanDevStatusbarWidget.updateTime(total);
             }
             lastHeartbeat = h;
+            if (isMainBranch(gitBranch)) {
+                showMainBranchWarning(project, gitBranch);
+            }
         }
     }
+
+    private static void showMainBranchWarning(Project project, String branch) {
+        if (!warnedBranches.add(branch == null ? "null" : branch)) return;
+        com.intellij.notification.NotificationGroupManager.getInstance()
+                .getNotificationGroup("PanDev Auto Worklog")
+                .createNotification(
+                        "PanDev: You are on a shared branch (" + branch + "). " +
+                                "Please switch to the branch corresponding to your task.",
+                        com.intellij.notification.NotificationType.WARNING
+                )
+                .notify(project);
+    }
+    private static final Set<String> MAIN_BRANCHES = Set.of(
+            "main", "master",
+            "dev", "prod", "test", "stable",
+            "sync-prod-to-dev", "stage"
+    );
+    private static boolean isMainBranch(String branch) {
+        if (branch == null) return true;
+        return MAIN_BRANCHES.contains(branch.toLowerCase())
+                || !TASK_PTRN.matcher(branch).find();
+    }
+
 
     public static Module getCurrentModule(Project project, VirtualFile virtualFile) {
         ModuleManager moduleManager = ModuleManager.getInstance(project);
