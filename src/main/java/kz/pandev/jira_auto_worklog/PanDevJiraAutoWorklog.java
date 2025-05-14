@@ -190,15 +190,10 @@ public final class PanDevJiraAutoWorklog implements Disposable {
                 )
                 .notify(project);
     }
-    private static final Set<String> MAIN_BRANCHES = Set.of(
-            "main", "master",
-            "dev", "prod", "test", "stable",
-            "sync-prod-to-dev", "stage"
-    );
+
     private static boolean isMainBranch(String branch) {
-        if (branch == null) return true;
-        return MAIN_BRANCHES.contains(branch.toLowerCase())
-                || !TASK_PTRN.matcher(branch).find();
+        if (branch == null || branch.isBlank()) return true;
+        return !TASK_PTRN.matcher(branch).find();
     }
 
 
