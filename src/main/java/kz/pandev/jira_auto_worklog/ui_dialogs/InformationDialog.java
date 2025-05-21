@@ -39,6 +39,7 @@ public class InformationDialog {
         JTextPane message = new JTextPane();
         message.setContentType("text/html");
         message.setText("<html><div style='width:300px;'>" +
+                "<p style='font-size:30pt;color:#23a230;font-weight:bold;margin:0 0 12px 0;'>✔ Connection successful</p>" +
                 "<p style='margin-top:0; margin-bottom:10px;'>This plugin automatically tracks your development time:</p>" +
                 "<ul style='margin-top:0; margin-bottom:10px;'>" +
                 "<li style='margin-bottom:5px;'>Extracts task key from branch name</li>" +

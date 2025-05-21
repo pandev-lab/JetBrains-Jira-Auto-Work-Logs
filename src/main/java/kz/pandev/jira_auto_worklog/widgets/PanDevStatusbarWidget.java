@@ -47,8 +47,11 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
         boolean configured = settings.getUrl() != null && !settings.getUrl().isBlank()
                 && settings.getToken() != null && !settings.getToken().isBlank();
 
-        String text = configured ? "0s" : "Click to log in";
-        SwingUtilities.invokeLater(() -> timeLabel.setText(text));
+        SwingUtilities.invokeLater(() -> {
+            timeLabel.setVisible(configured);
+            timeLabel.setText(configured ? "0s" : "");
+
+    });
     }
     /**
      * Получает главный компонент Widget-та.
