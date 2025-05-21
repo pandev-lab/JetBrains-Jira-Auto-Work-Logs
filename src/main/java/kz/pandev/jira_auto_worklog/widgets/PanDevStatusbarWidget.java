@@ -10,6 +10,7 @@ import kz.pandev.jira_auto_worklog.configs.ServerSettings;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
 import kz.pandev.jira_auto_worklog.ui_dialogs.LoginPage;
 import kz.pandev.jira_auto_worklog.ui_dialogs.Settings;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -44,14 +45,25 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
 
     private void updateAuthState() {
         ServerSettings settings = ServerSettingsFactory.getInstance();
-        boolean configured = settings.getUrl() != null && !settings.getUrl().isBlank()
-                && settings.getToken() != null && !settings.getToken().isBlank();
+        boolean configured = !StringUtils.isBlank(settings.getUrl())
+                && !StringUtils.isBlank(settings.getToken());
+
+        long cachedSeconds = 0;
+        if (configured) {
+            cachedSeconds = PanDevJiraAutoWorklog.heartbeatsCache.values()
+                    .stream()
+                    .mapToLong(Long::longValue)
+                    .sum();
+        }
+
+        String text = configured
+                ? kz.pandev.jira_auto_worklog.utils.TimeFormatUtil.pretty(cachedSeconds)
+                : "";
 
         SwingUtilities.invokeLater(() -> {
             timeLabel.setVisible(configured);
-            timeLabel.setText(configured ? "0s" : "");
-
-    });
+            timeLabel.setText(text);
+        });
     }
     /**
      * Получает главный компонент Widget-та.

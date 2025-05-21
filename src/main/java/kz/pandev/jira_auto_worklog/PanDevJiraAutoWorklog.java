@@ -22,6 +22,7 @@ import kz.pandev.jira_auto_worklog.models.Heartbeat;
 import kz.pandev.jira_auto_worklog.utils.GitInfoProvider;
 import kz.pandev.jira_auto_worklog.utils.SettingsFileReadWriterUtil;
 import kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidget;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -192,7 +193,7 @@ public final class PanDevJiraAutoWorklog implements Disposable {
     }
 
     private static boolean isMainBranch(String branch) {
-        if (branch == null || branch.isBlank()) return true;
+        if (StringUtils.isEmpty(branch)) return true;
         return !TASK_PTRN.matcher(branch).find();
     }
 
