@@ -122,63 +122,51 @@ public final class PanDevJiraAutoWorklog implements Disposable {
                 RoundingMode.HALF_UP);
     }
 
-    public static void appendHeartbeat(final VirtualFile file, final Project project, final boolean isWrite) {
+    public static void appendHeartbeat(final VirtualFile file,
+                                       final Project project,
+                                       final boolean isWrite) {
 
         if (!shouldLogFile(file)) return;
 
-        final BigDecimal time = PanDevJiraAutoWorklog.getCurrentTimestamp();
+        final BigDecimal time = getCurrentTimestamp();
 
-        if (!isWrite && file.getPath().equals(lastFile) && !enoughTimePassed(time)) {
-            return;
-        }
+        if (!isWrite && file.getPath().equals(lastFile) && !enoughTimePassed(time)) return;
 
         lastFile = file.getPath();
         lastTime = time;
 
-        Module currentModule = getCurrentModule(project, file);
-        String moduleGitBranch = null;
-
-        if (currentModule != null) {
-            moduleGitBranch = GitInfoProvider.getModuleGitBranch(currentModule);
-        }
-        final String projectBasePath = project.getBasePath();
-        final String projectName = project.getName();
-        final String[] gitInfo = GitInfoProvider.getGitBranch(projectBasePath);
-        final String gitBranch;
-
-        if (Objects.nonNull(moduleGitBranch)) {
-            gitBranch = moduleGitBranch;
-        } else {
-            gitBranch = gitInfo.length > 1 ? gitInfo[1] : null;
-        }
+        String projectBasePath = project.getBasePath();
+        String moduleBranch     = Optional.ofNullable(getCurrentModule(project, file))
+                .map(GitInfoProvider::getModuleGitBranch)
+                .orElse(null);
+        String[] gitInfo        = GitInfoProvider.getGitBranch(projectBasePath);
+        String gitBranch        = moduleBranch != null ? moduleBranch
+                : (gitInfo.length > 1 ? gitInfo[1] : null);
 
         Heartbeat h = new Heartbeat();
         h.setTimestamp(time);
-        h.setProject(projectName);
+        h.setProject(project.getName());
         h.setGitBranch(gitBranch);
         h.setFileName(file.getName());
 
-        if (lastHeartbeat == null) {
-            lastHeartbeat = h;
-        }
+        if (lastHeartbeat == null) lastHeartbeat = h;
 
-        Pattern hashPattern = Pattern.compile("^[0-9a-f]{40}$");
+        if (gitBranch == null || gitBranch.matches("^[0-9a-f]{40}$")) return;
+
         HeartbeatManager mgr = project.getService(HeartbeatManager.class);
-        if (gitBranch != null && !hashPattern.matcher(gitBranch).matches()) {
 
-            String complexKey = lastHeartbeat.getProject() + "|||" + lastHeartbeat.getGitBranch();
-
-            long diff = (h.getTimestamp().subtract(lastHeartbeat.getTimestamp())).longValue();
-
-            if (diff <= 900) {
-                mgr.add(gitBranch, diff);
-                PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
-            }
-            lastHeartbeat = h;
-            if (isMainBranch(gitBranch)) {
-                showMainBranchWarning(project, gitBranch);
-            }
+        if (mgr.switchBranch(gitBranch)) {
+            PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
         }
+
+        long diff = h.getTimestamp().subtract(lastHeartbeat.getTimestamp()).longValue();
+        if (diff <= 900) {
+            mgr.add(gitBranch, diff);
+            PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
+        }
+        lastHeartbeat = h;
+
+        if (isMainBranch(gitBranch)) showMainBranchWarning(project, gitBranch);
     }
 
     private static void showMainBranchWarning(Project project, String branch) {
