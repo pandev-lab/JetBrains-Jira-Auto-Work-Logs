@@ -19,6 +19,7 @@ import kz.pandev.jira_auto_worklog.configs.ServerSettings;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
 import kz.pandev.jira_auto_worklog.listeners.*;
 import kz.pandev.jira_auto_worklog.models.Heartbeat;
+import kz.pandev.jira_auto_worklog.models.HeartbeatManager;
 import kz.pandev.jira_auto_worklog.utils.GitInfoProvider;
 import kz.pandev.jira_auto_worklog.utils.SettingsFileReadWriterUtil;
 import kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidget;
@@ -162,7 +163,7 @@ public final class PanDevJiraAutoWorklog implements Disposable {
         }
 
         Pattern hashPattern = Pattern.compile("^[0-9a-f]{40}$");
-
+        HeartbeatManager mgr = project.getService(HeartbeatManager.class);
         if (gitBranch != null && !hashPattern.matcher(gitBranch).matches()) {
 
             String complexKey = lastHeartbeat.getProject() + "|||" + lastHeartbeat.getGitBranch();
@@ -170,8 +171,8 @@ public final class PanDevJiraAutoWorklog implements Disposable {
             long diff = (h.getTimestamp().subtract(lastHeartbeat.getTimestamp())).longValue();
 
             if (diff <= 900) {
-                long total = heartbeatsCache.merge(complexKey, diff, Long::sum);
-                PanDevStatusbarWidget.updateTime(total);
+                mgr.add(gitBranch, diff);
+                PanDevStatusbarWidget.updateTime(project, mgr.total());
             }
             lastHeartbeat = h;
             if (isMainBranch(gitBranch)) {

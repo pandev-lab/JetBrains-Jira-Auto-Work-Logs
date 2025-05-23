@@ -269,7 +269,7 @@ public final class GitCommitWatcher implements Disposable {
 
         if (response != null && response.statusCode() == 201) {
             heartbeatsCache.remove(complexKey);
-            PanDevStatusbarWidget.updateTime(0);
+            PanDevStatusbarWidget.updateTime(project,0);
         }
     }
 }

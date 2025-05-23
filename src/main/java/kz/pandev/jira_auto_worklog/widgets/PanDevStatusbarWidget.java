@@ -3,6 +3,9 @@ package kz.pandev.jira_auto_worklog.widgets;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.CustomStatusBarWidget;
+import com.intellij.openapi.wm.StatusBar;
+import com.intellij.openapi.wm.StatusBarWidget;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog;
@@ -25,22 +28,18 @@ import java.awt.event.MouseEvent;
 public class PanDevStatusbarWidget implements CustomStatusBarWidget {
 
     public static final String WIDGET_ID = "PanDevAutoWorklogStatusbarWidget";
-    private final JLabel logoLabel;
     private JPanel panel;
-
-    private final JLabel timeLabel;
-
     private static volatile PanDevStatusbarWidget INSTANCE;
-
+    private final Project project;
+    private final JLabel logoLabel = new JLabel(getLogoIcon());
+    private final JLabel timeLabel = new JLabel();
 
     /**
      * Конструктор, инициализирующий Widget с заданным проектом.
      * */
-    public PanDevStatusbarWidget() {
-        INSTANCE = this;
-        this.logoLabel = new JLabel(getLogoIcon());
-        this.timeLabel = new JLabel("0 s");
-        updateAuthState();
+    public PanDevStatusbarWidget(Project project) {
+        this.project = project;
+        refresh();
     }
 
     private void updateAuthState() {
@@ -112,15 +111,16 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
     public static void refresh() {
         if (INSTANCE != null) INSTANCE.updateAuthState();
     }
-    public static void updateTime(long seconds) {
-        if (INSTANCE == null){
-            System.out.println("[PanDev] updateTime: INSTANCE==null");
-            return;}
-        String text = kz.pandev.jira_auto_worklog.utils.TimeFormatUtil.pretty(seconds);
-        SwingUtilities.invokeLater(() -> INSTANCE.timeLabel.setText(text));
-        System.out.println("[PanDev] updateTime -> " + text);
+    public static void updateTime(Project p, long sec) {
+        StatusBar sb = WindowManager.getInstance().getStatusBar(p);
+        if (sb == null) return;
+        StatusBarWidget w = sb.getWidget(WIDGET_ID);
+        if (w instanceof PanDevStatusbarWidget pw) pw.setTime(sec);
     }
-
+    private void setTime(long sec) {
+        String txt = kz.pandev.jira_auto_worklog.utils.TimeFormatUtil.pretty(sec);
+        SwingUtilities.invokeLater(() -> timeLabel.setText(txt));
+    }
     /**
      * Получает уникальный идентификатор виджета.
      *

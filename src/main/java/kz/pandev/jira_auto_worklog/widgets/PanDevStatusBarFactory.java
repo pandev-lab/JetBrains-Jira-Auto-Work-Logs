@@ -42,6 +42,6 @@ public class PanDevStatusBarFactory implements StatusBarWidgetFactory {
      */
     @Override
     public @NotNull StatusBarWidget createWidget(@NotNull Project project) {
-        return new PanDevStatusbarWidget();
+        return new PanDevStatusbarWidget(project);
     }
 }
