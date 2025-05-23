@@ -16,6 +16,9 @@ public final class HeartbeatManager {
     }
 
     public void reset(String branch) { time.remove(branch); }
+    public long forBranch(String branch) {
+        return time.getOrDefault(branch, 0L);
+    }
 
     public long total() { return time.values().stream().mapToLong(Long::longValue).sum(); }
 }

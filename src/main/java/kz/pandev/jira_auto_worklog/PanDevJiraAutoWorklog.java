@@ -172,7 +172,7 @@ public final class PanDevJiraAutoWorklog implements Disposable {
 
             if (diff <= 900) {
                 mgr.add(gitBranch, diff);
-                PanDevStatusbarWidget.updateTime(project, mgr.total());
+                PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
             }
             lastHeartbeat = h;
             if (isMainBranch(gitBranch)) {

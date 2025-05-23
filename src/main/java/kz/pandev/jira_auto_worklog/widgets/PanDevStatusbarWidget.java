@@ -11,8 +11,10 @@ import com.intellij.util.ui.JBUI;
 import kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog;
 import kz.pandev.jira_auto_worklog.configs.ServerSettings;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
+import kz.pandev.jira_auto_worklog.models.HeartbeatManager;
 import kz.pandev.jira_auto_worklog.ui_dialogs.LoginPage;
 import kz.pandev.jira_auto_worklog.ui_dialogs.Settings;
+import kz.pandev.jira_auto_worklog.utils.GitInfoProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +41,10 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
      * */
     public PanDevStatusbarWidget(Project project) {
         this.project = project;
-        refresh();
+        String[] gitInfo = GitInfoProvider.getGitBranch(project.getBasePath());
+        String branch = gitInfo.length > 1 ? gitInfo[1] : null;
+        long sec = project.getService(HeartbeatManager.class).forBranch(branch);
+        setTime(sec);
     }
 
     private void updateAuthState() {
