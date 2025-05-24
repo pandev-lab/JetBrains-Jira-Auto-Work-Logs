@@ -23,7 +23,7 @@ public class PanDevStatusBarFactory implements StatusBarWidgetFactory {
     public @NotNull @NonNls String getId() {
         return PanDevStatusbarWidget.WIDGET_ID;
     }
-
+//
     /**
      * Возвращает имя виджета, отображаемое в настраиваемых параметрах.
      *
