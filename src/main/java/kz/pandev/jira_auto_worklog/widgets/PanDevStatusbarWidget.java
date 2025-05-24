@@ -41,19 +41,22 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
      * */
     public PanDevStatusbarWidget(Project project) {
         this.project = project;
+
         com.intellij.openapi.application.ApplicationManager
                 .getApplication()
                 .getService(kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog.class);
         INSTANCE = this;
         String[] gitInfo = GitInfoProvider.getGitBranch(project.getBasePath());
-        String branch = gitInfo.length > 1 ? gitInfo[1] : null;
+        String branch    = gitInfo.length > 1 ? gitInfo[1] : null;
         HeartbeatManager mgr = project.getService(HeartbeatManager.class);
-        long sec = project.getService(HeartbeatManager.class).forBranch(branch);
-        if (sec == 0 && branch != null) {
-                   String key = project.getName() + "|||" + branch;
-                   sec = PanDevJiraAutoWorklog.heartbeatsCache.getOrDefault(key, 0L);
-                   if (sec > 0) mgr.add(branch, sec);
-              }
+
+        long sec = mgr.forBranch(branch);
+        if (sec == 0 && StringUtils.isNotBlank(branch)) {
+            String key = project.getName() + "|||" + branch;
+            sec = PanDevJiraAutoWorklog.heartbeatsCache.getOrDefault(key, 0L);
+            if (sec > 0) mgr.add(branch, sec);
+        }
+
         setTime(sec);
     }
 
