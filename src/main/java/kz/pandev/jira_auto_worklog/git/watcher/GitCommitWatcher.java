@@ -250,26 +250,26 @@ public final class GitCommitWatcher implements Disposable {
     private void handleNewCommit(RevCommit commit, String branch) {
         PanDevJiraAutoWorklog.log.info("Processing new commit for project {} branch {}", projectName, branch);
         HeartbeatManager mgr = project.getService(HeartbeatManager.class);
-        String issueKey = IssueUtil.getIssueFromSourceBranch(branch);
+        String issueKey      = IssueUtil.getIssueFromSourceBranch(branch);
 
-        String complexKey = projectName + "|||" + branch;
+        String key = projectName + "|||" + branch;
 
-        Map<String, Long> heartbeatsCache = PanDevJiraAutoWorklog.heartbeatsCache;
-        long timeSpentSeconds = heartbeatsCache.get(complexKey);
+        long timeSpentSeconds = PanDevJiraAutoWorklog.heartbeatsCache
+                .getOrDefault(key, 0L);
         if (timeSpentSeconds < 60) timeSpentSeconds = 60;
-        PanDevJiraAutoWorklog.log.info("Processing new commit for project {} branch {}", projectName, branch);
-        PanDevJiraAutoWorklog.log.info("time {}", timeSpentSeconds);
 
         WorklogDto worklogDto = new WorklogDto();
         worklogDto.setTimeSpentSeconds(timeSpentSeconds);
         worklogDto.setComment(commit.getShortMessage());
 
-        HttpResponse<String> response = ApiClient.sendWorklogRequest(ServerSettingsFactory.getInstance(),
-                worklogDto, issueKey);
+        HttpResponse<String> response = ApiClient.sendWorklogRequest(
+                ServerSettingsFactory.getInstance(), worklogDto, issueKey);
 
         if (response != null && response.statusCode() == 201) {
             mgr.reset(branch);
             PanDevStatusbarWidget.updateTime(project, 0);
+
+            PanDevJiraAutoWorklog.heartbeatsCache.remove(key);
         }
     }
 }

@@ -168,6 +168,10 @@ public final class PanDevJiraAutoWorklog implements Disposable {
         long diff = h.getTimestamp().subtract(lastHeartbeat.getTimestamp()).longValue();
         if (diff <= 900) {
             mgr.add(gitBranch, diff);
+            String key = project.getName() + "|||" + gitBranch;
+            PanDevJiraAutoWorklog.heartbeatsCache.put(key,
+                    mgr.forBranch(gitBranch));
+
             PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
         }
         lastHeartbeat = h;
