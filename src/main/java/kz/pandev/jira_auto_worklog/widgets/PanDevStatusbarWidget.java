@@ -41,6 +41,9 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
      * */
     public PanDevStatusbarWidget(Project project) {
         this.project = project;
+        com.intellij.openapi.application.ApplicationManager
+                .getApplication()
+                .getService(kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog.class);
         INSTANCE = this;
         String[] gitInfo = GitInfoProvider.getGitBranch(project.getBasePath());
         String branch = gitInfo.length > 1 ? gitInfo[1] : null;
