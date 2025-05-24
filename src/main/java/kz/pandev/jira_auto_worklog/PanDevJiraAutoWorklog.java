@@ -156,7 +156,13 @@ public final class PanDevJiraAutoWorklog implements Disposable {
         HeartbeatManager mgr = project.getService(HeartbeatManager.class);
 
         if (mgr.switchBranch(gitBranch)) {
-            PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
+            long sec = mgr.forBranch(gitBranch);
+            if (sec == 0) {
+                String key = project.getName() + "|||" + gitBranch;
+                sec = PanDevJiraAutoWorklog.heartbeatsCache.getOrDefault(key, 0L);
+                if (sec > 0) mgr.add(gitBranch, sec);
+            }
+            PanDevStatusbarWidget.updateTime(project, sec);
         }
 
         long diff = h.getTimestamp().subtract(lastHeartbeat.getTimestamp()).longValue();
