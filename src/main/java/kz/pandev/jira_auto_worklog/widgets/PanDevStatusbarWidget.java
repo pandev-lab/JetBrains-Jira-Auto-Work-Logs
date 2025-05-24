@@ -41,9 +41,16 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
      * */
     public PanDevStatusbarWidget(Project project) {
         this.project = project;
+        INSTANCE = this;
         String[] gitInfo = GitInfoProvider.getGitBranch(project.getBasePath());
         String branch = gitInfo.length > 1 ? gitInfo[1] : null;
+        HeartbeatManager mgr = project.getService(HeartbeatManager.class);
         long sec = project.getService(HeartbeatManager.class).forBranch(branch);
+        if (sec == 0 && branch != null) {
+                   String key = project.getName() + "|||" + branch;
+                   sec = PanDevJiraAutoWorklog.heartbeatsCache.getOrDefault(key, 0L);
+                   if (sec > 0) mgr.add(branch, sec);
+              }
         setTime(sec);
     }
 
@@ -114,7 +121,13 @@ public class PanDevStatusbarWidget implements CustomStatusBarWidget {
     }
 
     public static void refresh() {
-        if (INSTANCE != null) INSTANCE.updateAuthState();
+        StatusBar sb = WindowManager.getInstance().getStatusBar(INSTANCE.project);
+        if (sb == null) return;
+
+        StatusBarWidget w = sb.getWidget(WIDGET_ID);
+        if (w instanceof PanDevStatusbarWidget widget) {
+            widget.updateAuthState();
+        }
     }
     public static void updateTime(Project p, long sec) {
         StatusBar sb = WindowManager.getInstance().getStatusBar(p);
