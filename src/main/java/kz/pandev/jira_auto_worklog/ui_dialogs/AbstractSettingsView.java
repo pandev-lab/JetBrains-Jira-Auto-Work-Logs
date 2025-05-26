@@ -17,6 +17,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class AbstractSettingsView extends DialogWrapper {
 
@@ -31,6 +32,7 @@ public class AbstractSettingsView extends DialogWrapper {
     protected JLabel usernameLabel;
     protected JTextField usernameInput;
     protected JPanel reportProblemLinkPanel;
+    protected JButton generateTokenBtn;
 
     protected AbstractSettingsView(@Nullable Project project) {
         super(project, true);
@@ -39,7 +41,7 @@ public class AbstractSettingsView extends DialogWrapper {
         titlePanel = getTitlePanel();
 
         userInfoFormPanel = getUserInfoFormPenal(getDocumentListener());
-
+        updateGenerateBtnState();
         JPanel outerPanel = new JPanel();
         outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
 
@@ -91,9 +93,13 @@ public class AbstractSettingsView extends DialogWrapper {
         tokenLabel.setBorder(JBUI.Borders.emptyTop(5));
         tokenInput.setToolTipText("Enter your Jira API token");
 
+        generateTokenBtn = new JButton("Generate Token");
+        generateTokenBtn.setEnabled(false);
+        generateTokenBtn.addActionListener(e -> openGeneratePage());
+
         userInfoOuterPanel.add(tokenLabel);
         userInfoOuterPanel.add(tokenInput);
-
+        userInfoOuterPanel.add(generateTokenBtn);
         userInfoOuterPanel.revalidate();
         userInfoOuterPanel.repaint();
 
@@ -137,27 +143,49 @@ public class AbstractSettingsView extends DialogWrapper {
         }
         return inputStream;
     }
-
+    private void updateGenerateBtnState() {
+        boolean enabled = !urlInput.getText().trim().isBlank();
+        generateTokenBtn.setEnabled(enabled);
+    }
     private DocumentListener getDocumentListener() {
         return new DocumentListener() {
+            private void changed() {
+                setErrorText(null);
+                getOKAction().setEnabled(true);
+                updateGenerateBtnState();
+            }
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 setErrorText(null);
                 getOKAction().setEnabled(true);
+                changed();
             }
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
                 insertUpdate(documentEvent);
+                changed();
             }
 
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 insertUpdate(documentEvent);
+                changed();
             }
         };
     }
+    private void openGeneratePage() {
+        String url = urlInput.getText().trim();
+        if (url.isBlank()) return;        // безопасность
 
+        boolean cloud = ApiClient.isJiraCloudHost(url);   // публичный метод
+        String link = cloud
+                ? "https://id.atlassian.com/manage-profile/security/api-tokens"
+                : url.replaceAll("/+$", "")
+                + "/secure/ViewProfile.jspa?selectedPage=personal-access-tokens";
+
+        com.intellij.ide.BrowserUtil.browse(link);
+    }
     @Override
     protected @Nullable JComponent createCenterPanel() {
         return mainPanel;

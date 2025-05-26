@@ -23,7 +23,7 @@ public class PanDevStatusBarFactory implements StatusBarWidgetFactory {
     public @NotNull @NonNls String getId() {
         return PanDevStatusbarWidget.WIDGET_ID;
     }
-
+//
     /**
      * Возвращает имя виджета, отображаемое в настраиваемых параметрах.
      *
@@ -42,6 +42,6 @@ public class PanDevStatusBarFactory implements StatusBarWidgetFactory {
      */
     @Override
     public @NotNull StatusBarWidget createWidget(@NotNull Project project) {
-        return new PanDevStatusbarWidget();
+        return new PanDevStatusbarWidget(project);
     }
 }

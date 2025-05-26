@@ -19,9 +19,11 @@ import kz.pandev.jira_auto_worklog.configs.ServerSettings;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
 import kz.pandev.jira_auto_worklog.listeners.*;
 import kz.pandev.jira_auto_worklog.models.Heartbeat;
+import kz.pandev.jira_auto_worklog.models.HeartbeatManager;
 import kz.pandev.jira_auto_worklog.utils.GitInfoProvider;
 import kz.pandev.jira_auto_worklog.utils.SettingsFileReadWriterUtil;
 import kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidget;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -120,63 +122,61 @@ public final class PanDevJiraAutoWorklog implements Disposable {
                 RoundingMode.HALF_UP);
     }
 
-    public static void appendHeartbeat(final VirtualFile file, final Project project, final boolean isWrite) {
+    public static void appendHeartbeat(final VirtualFile file,
+                                       final Project project,
+                                       final boolean isWrite) {
 
         if (!shouldLogFile(file)) return;
 
-        final BigDecimal time = PanDevJiraAutoWorklog.getCurrentTimestamp();
+        final BigDecimal time = getCurrentTimestamp();
 
-        if (!isWrite && file.getPath().equals(lastFile) && !enoughTimePassed(time)) {
-            return;
-        }
+        if (!isWrite && file.getPath().equals(lastFile) && !enoughTimePassed(time)) return;
 
         lastFile = file.getPath();
         lastTime = time;
 
-        Module currentModule = getCurrentModule(project, file);
-        String moduleGitBranch = null;
-
-        if (currentModule != null) {
-            moduleGitBranch = GitInfoProvider.getModuleGitBranch(currentModule);
-        }
-        final String projectBasePath = project.getBasePath();
-        final String projectName = project.getName();
-        final String[] gitInfo = GitInfoProvider.getGitBranch(projectBasePath);
-        final String gitBranch;
-
-        if (Objects.nonNull(moduleGitBranch)) {
-            gitBranch = moduleGitBranch;
-        } else {
-            gitBranch = gitInfo.length > 1 ? gitInfo[1] : null;
-        }
+        String projectBasePath = project.getBasePath();
+        String moduleBranch     = Optional.ofNullable(getCurrentModule(project, file))
+                .map(GitInfoProvider::getModuleGitBranch)
+                .orElse(null);
+        String[] gitInfo        = GitInfoProvider.getGitBranch(projectBasePath);
+        String gitBranch        = moduleBranch != null ? moduleBranch
+                : (gitInfo.length > 1 ? gitInfo[1] : null);
 
         Heartbeat h = new Heartbeat();
         h.setTimestamp(time);
-        h.setProject(projectName);
+        h.setProject(project.getName());
         h.setGitBranch(gitBranch);
         h.setFileName(file.getName());
 
-        if (lastHeartbeat == null) {
-            lastHeartbeat = h;
+        if (lastHeartbeat == null) lastHeartbeat = h;
+
+        if (gitBranch == null || gitBranch.matches("^[0-9a-f]{40}$")) return;
+
+        HeartbeatManager mgr = project.getService(HeartbeatManager.class);
+
+        if (mgr.switchBranch(gitBranch)) {
+            long sec = mgr.forBranch(gitBranch);
+            if (sec == 0) {
+                String key = project.getName() + "|||" + gitBranch;
+                sec = PanDevJiraAutoWorklog.heartbeatsCache.getOrDefault(key, 0L);
+                if (sec > 0) mgr.add(gitBranch, sec);
+            }
+            PanDevStatusbarWidget.updateTime(project, sec);
         }
 
-        Pattern hashPattern = Pattern.compile("^[0-9a-f]{40}$");
+        long diff = h.getTimestamp().subtract(lastHeartbeat.getTimestamp()).longValue();
+        if (diff <= 900) {
+            mgr.add(gitBranch, diff);
+            String key = project.getName() + "|||" + gitBranch;
+            PanDevJiraAutoWorklog.heartbeatsCache.put(key,
+                    mgr.forBranch(gitBranch));
 
-        if (gitBranch != null && !hashPattern.matcher(gitBranch).matches()) {
-
-            String complexKey = lastHeartbeat.getProject() + "|||" + lastHeartbeat.getGitBranch();
-
-            long diff = (h.getTimestamp().subtract(lastHeartbeat.getTimestamp())).longValue();
-
-            if (diff <= 900) {
-                long total = heartbeatsCache.merge(complexKey, diff, Long::sum);
-                PanDevStatusbarWidget.updateTime(total);
-            }
-            lastHeartbeat = h;
-            if (isMainBranch(gitBranch)) {
-                showMainBranchWarning(project, gitBranch);
-            }
+            PanDevStatusbarWidget.updateTime(project, mgr.forBranch(gitBranch));
         }
+        lastHeartbeat = h;
+
+        if (isMainBranch(gitBranch)) showMainBranchWarning(project, gitBranch);
     }
 
     private static void showMainBranchWarning(Project project, String branch) {
@@ -190,15 +190,10 @@ public final class PanDevJiraAutoWorklog implements Disposable {
                 )
                 .notify(project);
     }
-    private static final Set<String> MAIN_BRANCHES = Set.of(
-            "main", "master",
-            "dev", "prod", "test", "stable",
-            "sync-prod-to-dev", "stage"
-    );
+
     private static boolean isMainBranch(String branch) {
-        if (branch == null) return true;
-        return MAIN_BRANCHES.contains(branch.toLowerCase())
-                || !TASK_PTRN.matcher(branch).find();
+        if (StringUtils.isEmpty(branch)) return true;
+        return !TASK_PTRN.matcher(branch).find();
     }
 
 

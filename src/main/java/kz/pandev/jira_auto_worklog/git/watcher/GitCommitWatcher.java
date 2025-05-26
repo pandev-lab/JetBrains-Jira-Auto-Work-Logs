@@ -11,6 +11,7 @@ import com.intellij.openapi.util.Disposer;
 import kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog;
 import kz.pandev.jira_auto_worklog.clients.ApiClient;
 import kz.pandev.jira_auto_worklog.factory.ServerSettingsFactory;
+import kz.pandev.jira_auto_worklog.models.HeartbeatManager;
 import kz.pandev.jira_auto_worklog.models.WorklogDto;
 import kz.pandev.jira_auto_worklog.utils.IssueUtil;
 import kz.pandev.jira_auto_worklog.widgets.PanDevStatusbarWidget;
@@ -41,7 +42,6 @@ public final class GitCommitWatcher implements Disposable {
     private final Path gitLogPath;
     private final String projectBasePath;
     private final String projectName;
-
     private static final String NO_COMMIT = "NO_COMMIT";
     private static final String GIT_LOG_PATH = "/.git/logs/HEAD";
 
@@ -249,27 +249,27 @@ public final class GitCommitWatcher implements Disposable {
      */
     private void handleNewCommit(RevCommit commit, String branch) {
         PanDevJiraAutoWorklog.log.info("Processing new commit for project {} branch {}", projectName, branch);
+        HeartbeatManager mgr = project.getService(HeartbeatManager.class);
+        String issueKey      = IssueUtil.getIssueFromSourceBranch(branch);
 
-        String issueKey = IssueUtil.getIssueFromSourceBranch(branch);
+        String key = projectName + "|||" + branch;
 
-        String complexKey = projectName + "|||" + branch;
-
-        Map<String, Long> heartbeatsCache = PanDevJiraAutoWorklog.heartbeatsCache;
-        long timeSpentSeconds = heartbeatsCache.get(complexKey);
+        long timeSpentSeconds = PanDevJiraAutoWorklog.heartbeatsCache
+                .getOrDefault(key, 0L);
         if (timeSpentSeconds < 60) timeSpentSeconds = 60;
-        PanDevJiraAutoWorklog.log.info("Processing new commit for project {} branch {}", projectName, branch);
-        PanDevJiraAutoWorklog.log.info("time {}", timeSpentSeconds);
 
         WorklogDto worklogDto = new WorklogDto();
         worklogDto.setTimeSpentSeconds(timeSpentSeconds);
         worklogDto.setComment(commit.getShortMessage());
 
-        HttpResponse<String> response = ApiClient.sendWorklogRequest(ServerSettingsFactory.getInstance(),
-                worklogDto, issueKey);
+        HttpResponse<String> response = ApiClient.sendWorklogRequest(
+                ServerSettingsFactory.getInstance(), worklogDto, issueKey);
 
         if (response != null && response.statusCode() == 201) {
-            heartbeatsCache.remove(complexKey);
-            PanDevStatusbarWidget.updateTime(0);
+            mgr.reset(branch);
+            PanDevStatusbarWidget.updateTime(project, 0);
+
+            PanDevJiraAutoWorklog.heartbeatsCache.remove(key);
         }
     }
 }

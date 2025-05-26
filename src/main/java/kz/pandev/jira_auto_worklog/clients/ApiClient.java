@@ -54,7 +54,9 @@ public class ApiClient {
             }
         }
 
-
+    public static boolean isJiraCloudHost(String url) {
+        return url != null && url.matches("^https://[a-zA-Z0-9-]+\\.atlassian\\.net.*$");
+    }
     /**
      * Формирует заголовки для запросов в формате, совместимом с HttpClient.
      *
