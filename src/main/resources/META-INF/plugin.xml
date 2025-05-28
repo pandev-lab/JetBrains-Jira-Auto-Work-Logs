@@ -13,6 +13,8 @@
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
   <description><![CDATA[
+PanDev Jira Auto Worklog brings fully automatic, commit-based time tracking to Jira right inside your JetBrains IDE.
+
 <h2>🚀 PanDev Jira Auto Worklog</h2>
 <p><strong>Effortless Jira time tracking — powered by your Git workflow.</strong></p>
 
