@@ -13,39 +13,9 @@
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
   <description><![CDATA[
-<h2>🚀 PanDev Jira Auto Worklog</h2>
-<p><strong>Effortless Jira time tracking — powered by your Git workflow.</strong></p>
-
-<p>This plugin automatically logs time in Jira every time you commit code in your JetBrains IDE. No timers, no manual input — just focus on your work, and let the plugin handle the rest.</p>
-
-<h3>🛠 How It Works</h3>
-<ul>
-  <li>Create a Git branch that includes your Jira issue key (e.g., <code>feature/TASK-234</code>)</li>
-  <li>Work as usual — the plugin tracks your activity in that branch</li>
-  <li>When you commit, the time spent is automatically logged to Jira</li>
-  <li>The commit message becomes the worklog comment</li>
-</ul>
-
-<p><strong>🧠 You code. We track. Jira logs stay up to date — without a second thought.</strong></p>
-
-<h3>✅ Why Developers Love It</h3>
-<ul>
-  <li>⏱️ <strong>Automatic Time Tracking:</strong> No start/stop buttons — just real work = real logs</li>
-  <li>🧩 <strong>Commit-Based Context:</strong> Matches your code activity with the right Jira issue</li>
-  <li>🔐 <strong>Private & Secure:</strong> All data is sent directly to your Jira — nothing is stored elsewhere</li>
-  <li>🪄 <strong>Zero-click experience:</strong> Once configured, it just works in the background</li>
-</ul>
-
-<p>Save hours each week. Stay focused. And never forget to log time again.</p>
-
-<h3>🔧 Requirements</h3>
-<ul>
-  <li>Compatible with Jira Cloud and Jira Server</li>
-  <li>Requires the Jira issue key in your Git branch name (e.g., <code>feature/PROJECT-123</code>)</li>
-  <li>Supports any JetBrains IDE (IntelliJ IDEA, WebStorm, PyCharm, etc.)</li>
-</ul>
-
-<p><em>📝 Note: This is an independent plugin developed by PanDev and is not officially affiliated with Jira or Atlassian.</em></p>
+PanDev Jira Auto Worklog turns each Git commit into an accurate Jira work-log.
+Branch name holds the issue key, the plugin measures edit time and posts it
+to Jira automatically—no timers, no manual entry.
 ]]></description>
 
   <product-descriptor code="PPANDEVJIRAAUTO" release-date="20250427" release-version="20251"/>
