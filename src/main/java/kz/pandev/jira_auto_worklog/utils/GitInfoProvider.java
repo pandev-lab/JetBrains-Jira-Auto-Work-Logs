@@ -6,7 +6,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import kz.pandev.jira_auto_worklog.PanDevJiraAutoWorklog;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,18 +21,38 @@ public final class GitInfoProvider {
     }
 
     public static String[] getGitBranch(String path) {
-        File projectDirectory = new File(Objects.requireNonNull(path));
-        File gitFolder = findGitFolder(projectDirectory);
-
+        if (path == null) return new String[0];
+        File rootDir = new File(path);
+        File gitFolder = deepFindGitFolder(rootDir);
         if (gitFolder != null) {
-            String repositoryName = getRepositoryPath(gitFolder);
+            String repoName   = gitFolder.getParentFile().getName();
             String branchName = getCurrentBranch(gitFolder);
-            return new String[]{repositoryName, branchName};
-        } else {
-            return new String[0];
+            return new String[] { repoName, branchName };
         }
+        return new String[0];
     }
+    /**
+     * Рекурсивный поиск первой попавшейся директории .git,
+     * начиная с указанного каталога и проходя по всем подпапкам.
+     */
+    private static File deepFindGitFolder(File dir) {
 
+        if (dir == null || !dir.isDirectory()) return null;
+
+        // 1. Смотрим текущую директорию
+        File firstLvlGit = new File(dir, ".git");
+        if (firstLvlGit.isDirectory()) return firstLvlGit;
+
+        // 2. Проходим по подпапкам
+        File[] subDirs = dir.listFiles(File::isDirectory);
+        if (subDirs == null) return null;
+
+        for (File sub : subDirs) {
+            File found = deepFindGitFolder(sub);
+            if (found != null) return found;
+        }
+        return null;
+    }
     public static File findGitFolder(File directory) {
         PanDevJiraAutoWorklog.log.info("Looking for directory: {}", directory);
         File[] files = directory.listFiles();

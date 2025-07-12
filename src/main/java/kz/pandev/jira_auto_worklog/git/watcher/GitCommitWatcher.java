@@ -36,7 +36,8 @@ public final class GitCommitWatcher implements Disposable {
     private WatchService watchService;
     private String lastKnownCommit;
     private boolean running = true;
-
+    private String lastProcessedSha = "";
+    private long   lastWorklogTs    = 0L;
     private final Project project;
     private final Disposable disposable;
     private final Path gitLogPath;
@@ -249,18 +250,27 @@ public final class GitCommitWatcher implements Disposable {
      */
     private void handleNewCommit(RevCommit commit, String branch) {
         PanDevJiraAutoWorklog.log.info("Processing new commit for project {} branch {}", projectName, branch);
+        if (commit.getName().equals(lastProcessedSha)
+                && System.currentTimeMillis() - lastWorklogTs < 60_000) {
+            return;
+        }
+        lastProcessedSha = commit.getName();
+        lastWorklogTs    = System.currentTimeMillis();
         HeartbeatManager mgr = project.getService(HeartbeatManager.class);
         String issueKey      = IssueUtil.getIssueFromSourceBranch(branch);
 
         String key = projectName + "|||" + branch;
-
+        PanDevJiraAutoWorklog.heartbeatsCache.remove(key);
         long timeSpentSeconds = PanDevJiraAutoWorklog.heartbeatsCache
                 .getOrDefault(key, 0L);
         if (timeSpentSeconds < 60) timeSpentSeconds = 60;
 
         WorklogDto worklogDto = new WorklogDto();
         worklogDto.setTimeSpentSeconds(timeSpentSeconds);
-        worklogDto.setComment(commit.getShortMessage());
+        String fullMsg = commit.getFullMessage()
+                .replace("\r\n", "\n")
+                .replace("\n", " — ");
+        worklogDto.setComment(fullMsg);
 
         HttpResponse<String> response = ApiClient.sendWorklogRequest(
                 ServerSettingsFactory.getInstance(), worklogDto, issueKey);

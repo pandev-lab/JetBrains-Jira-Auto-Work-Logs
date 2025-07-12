@@ -28,7 +28,6 @@ public class LoginPage extends AbstractSettingsView {
         }
         return super.doValidate();
     }
-
     @Override
     public void doOKAction() {
         ServerSettingsFactory.updateInstance(Map.of(
