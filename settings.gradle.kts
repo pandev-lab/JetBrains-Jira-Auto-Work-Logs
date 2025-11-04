@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "pandev-jira-auto-worklog"
+rootProject.name = "jira-auto-worklog"
