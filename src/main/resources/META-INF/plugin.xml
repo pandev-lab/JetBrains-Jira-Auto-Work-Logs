@@ -5,17 +5,17 @@
 
   <!-- Public plugin name should be written in Title Case.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-  <name>PanDev Jira Auto Worklog</name>
+  <name>Jira Auto Worklog</name>
   <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-  <vendor email="support@pandev.kz" url="https://www.pandev.kz">PanDev</vendor>
+  <vendor email="support@pandev.io" url="https://pandev.io">PanDev</vendor>
 
   <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
        Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
   <description><![CDATA[
-PanDev Jira Auto Worklog brings fully automatic, commit-based time tracking to Jira right inside your JetBrains IDE.
+Jira Auto Worklog brings fully automatic, commit-based time tracking to Jira right inside your JetBrains IDE.
 
-<h2>🚀 PanDev Jira Auto Worklog</h2>
+<h2>🚀Jira Auto Worklog</h2>
 <p><strong>Effortless Jira time tracking — powered by your Git workflow.</strong></p>
 
 <p>This plugin automatically logs time in Jira every time you commit code in your JetBrains IDE. No timers, no manual input — just focus on your work, and let the plugin handle the rest.</p>
@@ -61,7 +61,7 @@ PanDev Jira Auto Worklog brings fully automatic, commit-based time tracking to J
        Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup
-            id="PanDev Auto Worklog"
+            id="Auto Worklog"
             displayType="BALLOON"
             isLogByDefault="false"/>
     <statusBarWidgetFactory implementation="kz.pandev.jira_auto_worklog.widgets.PanDevStatusBarFactory"

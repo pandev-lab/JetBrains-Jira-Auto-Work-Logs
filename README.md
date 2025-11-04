@@ -1,4 +1,4 @@
-# PanDev Jira Auto Worklog
+# Jira Auto Worklog
 
 A plugin for JetBrains products that automatically tracks your work time and publishes worklogs to Jira when you commit code.
 
@@ -11,7 +11,7 @@ A plugin for JetBrains products that automatically tracks your work time and pub
 
 1. Open IntelliJ IDEA
 2. Go to `File → Settings → Plugins`
-3. Search for "PanDev Jira Auto Worklog" in the Marketplace
+3. Search for "Jira Auto Worklog" in the Marketplace
 4. Click "Install"
 5. Restart IDE when prompted
 
